@@ -15,6 +15,13 @@ class CountryDetailViewController: UIViewController {
 		case retry
 		case dismiss
 		case done
+        
+        var title: String {
+            switch self {
+            case .retry: return "Retry"
+            default: return "OK"
+            }
+        }
 	}
 	
 	@IBOutlet weak var mapView: MKMapView!
@@ -83,7 +90,7 @@ class CountryDetailViewController: UIViewController {
 	/// Present a reusable alert with an `action` type passed for handling different...actions
 	private func showAlert(title: String = "Uh Oh 🙁", message: String, action: AlertAction) {
 		let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-		alert.addAction(UIAlertAction(title: action == .dismiss ? "OK" : "Retry", style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: action.title, style: .default, handler: { _ in
 			switch action {
 			case .retry:
 				self.fetchProvinces()
@@ -126,6 +133,10 @@ extension CountryDetailViewController: UITableViewDelegate {
 		let province = provinces[indexPath.row]
 		let query = "\(province.name), \(country.name)"
 		let annotationTitle = province.name
-		mapView.setFocusToLocation(withQuery: query, annotationTitle: annotationTitle, latitudeDelta: 0.2, longitudeDelta: 0.2)
+        mapView.setFocusToLocation(withQuery: query, annotationTitle: annotationTitle, latitudeDelta: 0.2, longitudeDelta: 0.2) { (error) in
+            if error != nil {
+                self.showAlert(message: "Couldn't update map to the selected province.", action: .done)
+            }
+        }
 	}
 }

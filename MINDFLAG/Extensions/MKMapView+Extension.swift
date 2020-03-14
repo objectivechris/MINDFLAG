@@ -21,7 +21,7 @@ extension MKMapView {
 	
 	This method also drops an annotation to the specified location.
 	*/
-	func setFocusToLocation(withQuery query: String, annotationTitle: String? = nil, latitudeDelta: CLLocationDegrees = 10.0, longitudeDelta: CLLocationDegrees = 10.0) {
+	func setFocusToLocation(withQuery query: String, annotationTitle: String? = nil, latitudeDelta: CLLocationDegrees = 10.0, longitudeDelta: CLLocationDegrees = 10.0, completion: ((Error?) -> ())? = nil) {
 		
 		// Create a search request with passed in query
 		let request = MKLocalSearch.Request()
@@ -34,7 +34,8 @@ extension MKMapView {
 		localSearch.start { (response, error) in
 			
 			if let error = error {
-				return print(error.localizedDescription)
+                completion?(error)
+				return
 			}
 			
 			// Remove any annotations currently displayed
@@ -59,6 +60,7 @@ extension MKMapView {
 				let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
 				let region = MKCoordinateRegion(center: coordinate, span: span)
 				self.setRegion(region, animated: true)
+                completion?(nil)
 			}
 		}
 	}
