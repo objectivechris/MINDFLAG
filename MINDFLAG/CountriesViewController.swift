@@ -38,6 +38,7 @@ class CountriesViewController: UIViewController {
 		tableView.register(CountriesCell.nib, forCellReuseIdentifier: CountriesCell.identifier)
 		tableView.backgroundView = activityIndicator
 		tableView.refreshControl = refreshControl
+		tableView.tableFooterView = UIView()
 		
 		fetchCountries()
     }
@@ -47,7 +48,6 @@ class CountriesViewController: UIViewController {
 		APIClient.shared.fetchCountries { [unowned self] (countries, error) in
 			if error != nil {
 				self.showAlert(message: "Failed to get list of countries")
-				self.activityIndicator.stopAnimating()
 				return
 			}
 			
@@ -70,6 +70,11 @@ class CountriesViewController: UIViewController {
 		alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { _ in
 			self.fetchCountries()
 		}))
+		
+		if self.activityIndicator.isAnimating {
+			self.activityIndicator.stopAnimating()
+		}
+		
 		self.present(alert, animated: true, completion: nil)
 	}
 	
