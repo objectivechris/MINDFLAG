@@ -21,20 +21,3 @@ struct Country: Codable {
 		case phoneCode = "PhoneCode"
 	}
 }
-
-extension Country: Comparable {
-	static func < (lhs: Country, rhs: Country) -> Bool {
-		if lhs.name != rhs.name {
-            return lhs.name < rhs.name
-        } else if lhs.id != rhs.id {
-            return lhs.id < rhs.id
-        } else {
-            return lhs.code < rhs.code
-        }
-	}
-	
-	static func == (lhs: Country, rhs: Country) -> Bool {
-        return lhs.name == rhs.name && lhs.id == rhs.id
-            && lhs.code == rhs.code
-    }
-}

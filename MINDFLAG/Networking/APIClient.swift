@@ -8,20 +8,20 @@
 
 import Foundation
 
+/// This enum is used to create and configure `URL`s
 enum Endpoint {
 	
 	static let baseURL = "https://connect.mindbodyonline.com/rest/worldregions/country"
 	static let flagsURL = "https://www.countryflags.io/"
 	
 	case countries
-	case province(String)
+	case province(Int)
 	case flag(String)
 	
 	var stringValue: String {
 		switch self {
 		case .countries: return Endpoint.baseURL
-		case .province(let id):
-			return Endpoint.baseURL + "/\(id)/province"
+		case .province(let id): return Endpoint.baseURL + "/\(id)/province"
 		case .flag(let code): return Endpoint.flagsURL + "\(code)/flat/64.png"
 		}
 	}
@@ -33,21 +33,20 @@ enum Endpoint {
 
 class APIClient {
 	
+	static let shared = APIClient()
+	
 	private let decoder = JSONDecoder()
 	private let session: URLSession
 	
-	private init(configuration: URLSessionConfiguration) {
-		self.session = URLSession(configuration: configuration)
+	private init() {
+		self.session = URLSession(configuration: .default)
 	}
-	
-	convenience init() {
-		self.init(configuration: .default)
-	}
-	
+		
 	typealias CountriesCompletionHandler = ([Country]?, APIError?) -> Void
 	typealias ProvincesCompletionHandler = ([Province]?, APIError?) -> Void
 	
-	func getCountries(completionHandler completion: @escaping CountriesCompletionHandler) {
+	/// Returns a list of countries and an error (if needed)
+	func fetchCountries(completionHandler completion: @escaping CountriesCompletionHandler) {
 		request(url: Endpoint.countries.url, responseType: [Country].self) { (response, error) in
 			if error != nil {
 				completion(nil, APIError.requestFailed)
@@ -60,13 +59,31 @@ class APIClient {
 		}
 	}
 	
-	func getProvinces(forId id: String, completionHandler completion: @escaping CountriesCompletionHandler) {
-		
+	/// Pass in an id
+	/// Returns a list of provinces and an error (if needed)
+	func fetchProvinces(forId id: Int, completionHandler completion: @escaping ProvincesCompletionHandler) {
+		request(url: Endpoint.province(id).url, responseType: [Province].self) { (response, error) in
+			if error != nil {
+				completion(nil, APIError.requestFailed)
+				return
+			}
+			
+			if let response = response {
+				completion(response, nil)
+			}
+		}
 	}
 }
 
 extension APIClient {
 	
+	/**
+	This is a generic request where its `ResponseType` conforms to `Decodable`
+	- parameters:
+		- url: The url for the request
+		- responseType: Decodable type
+	- returns: completion with an optional `ResponseType` and an optional `Error`
+	*/
 	private func request<ResponseType: Decodable>(url: URL?, responseType: ResponseType.Type, completion: @escaping (ResponseType?, Error?) -> ()) {
 		
 		guard let url = url else {

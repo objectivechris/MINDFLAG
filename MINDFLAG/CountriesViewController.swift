@@ -12,7 +12,8 @@ class CountriesViewController: UIViewController {
 
 	@IBOutlet weak var tableView: UITableView!
 	
-	private let client = APIClient()
+	// Local property used to store retrieved countries
+	// and populate tableview
 	private var countries = [Country]() {
 		didSet {
 			tableView.reloadData()
@@ -41,9 +42,9 @@ class CountriesViewController: UIViewController {
 		fetchCountries()
     }
 	
-	func fetchCountries() {
+	private func fetchCountries() {
 		activityIndicator.startAnimating()
-		self.client.getCountries { [unowned self] (countries, error) in
+		APIClient.shared.fetchCountries { [unowned self] (countries, error) in
 			if error != nil {
 				self.showAlert(message: "Failed to get list of countries")
 				self.activityIndicator.stopAnimating()
@@ -71,6 +72,15 @@ class CountriesViewController: UIViewController {
 		}))
 		self.present(alert, animated: true, completion: nil)
 	}
+	
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		if segue.identifier == "showProvince", let navVC = segue.destination as? UINavigationController, let countryDetailVC = navVC.topViewController as? CountryDetailViewController {
+			if let cell = sender as? CountriesCell, let indexPath = tableView.indexPath(for: cell) {
+				let country = countries[indexPath.row]
+				countryDetailVC.country = country
+			}
+		}
+	}
 }
 
 extension CountriesViewController: UITableViewDataSource {
@@ -78,7 +88,6 @@ extension CountriesViewController: UITableViewDataSource {
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return countries.count
     }
-
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: CountriesCell.identifier, for: indexPath) as! CountriesCell
@@ -88,4 +97,14 @@ extension CountriesViewController: UITableViewDataSource {
 
         return cell
     }
+}
+
+extension CountriesViewController: UITableViewDelegate {
+	
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		tableView.deselectRow(at: indexPath, animated: true)
+		
+		let cell = tableView.cellForRow(at: indexPath)
+		self.performSegue(withIdentifier: "showProvince", sender: cell)
+	}
 }

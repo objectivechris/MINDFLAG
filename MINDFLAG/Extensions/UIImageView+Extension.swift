@@ -9,6 +9,15 @@
 import UIKit
 
 extension UIImageView {
+	
+	/**
+	Call this method on an instance of UIImageView to asynchonously fetch an image and set its `image` property
+	- parameters:
+		- url: The url for the specified image
+		- placeholder: An optional placeholder image to use
+	
+	This method also uses a cache system to store retrieved images
+	*/
     func load(url: URL, placeholder: UIImage?) {
         let cache = URLCache.shared
         let request = URLRequest(url: url)
