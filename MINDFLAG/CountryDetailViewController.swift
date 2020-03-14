@@ -126,6 +126,6 @@ extension CountryDetailViewController: UITableViewDelegate {
 		let province = provinces[indexPath.row]
 		let query = "\(province.name), \(country.name)"
 		let annotationTitle = province.name
-		mapView.setFocusToLocation(withQuery: query, annotationTitle: annotationTitle, latitudeDelta: 1.0, longitudeDelta: 1.0)
+		mapView.setFocusToLocation(withQuery: query, annotationTitle: annotationTitle, latitudeDelta: 0.2, longitudeDelta: 0.2)
 	}
 }
