@@ -66,19 +66,19 @@ class CountryDetailViewController: UIViewController {
 	private func fetchProvinces() {
 		guard let id = country?.id else { return }
 		activityIndicator.startAnimating()
-		APIClient.shared.fetchProvinces(forId: id) { (provinces, error) in
+		APIClient.shared.fetchProvinces(forId: id) { [weak self] (provinces, error) in
 			if error != nil {
-				self.showAlert(message: "Failed to get provinces...", action: .retry)
-				self.activityIndicator.stopAnimating()
+				self?.showAlert(message: "Failed to get provinces...", action: .retry)
+                self?.activityIndicator.stopAnimating()
 				return
 			}
 			
 			if let provinces = provinces, provinces.count > 0 {
-				self.provinces = provinces
-				self.activityIndicator.stopAnimating()
+				self?.provinces = provinces
+				self?.activityIndicator.stopAnimating()
 			} else {
-				self.showAlert(message: "It looks like this country doesn't have any provinces.", action: .dismiss)
-				self.activityIndicator.stopAnimating()
+				self?.showAlert(message: "It looks like this country doesn't have any provinces.", action: .dismiss)
+				self?.activityIndicator.stopAnimating()
 			}
 		}
 	}

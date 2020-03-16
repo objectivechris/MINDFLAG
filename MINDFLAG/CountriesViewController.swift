@@ -61,7 +61,6 @@ class CountriesViewController: UIViewController {
 	@objc private func refresh() {
 		countries.removeAll()
 		fetchCountries()
-		self.activityIndicator.isHidden = self.refreshControl.isRefreshing
 		self.refreshControl.endRefreshing()
 	}
 	
